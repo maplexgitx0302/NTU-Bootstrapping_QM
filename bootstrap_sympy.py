@@ -12,12 +12,13 @@ from sympy import Poly
 from sympy.sets.sets import Intersection, Union
 from sympy.solvers.inequalities import solve_poly_inequality
 
-def sympy_solve_intervals(matrix, config, hyperparameters=None, det_indep=False):
+def sympy_solve_intervals(matrix, config, hyperparameters=None, det_indep=False, confirm=False):
     '''
         matrix -> class : the potential we want to solve
         config -> dict : contains information computing
         hyperparameters -> dict : contains information of hyperparameters
         det_indep -> bool : whether intersect new intervals with old intervals
+        confirm -> whether to keep the small interval
     '''
     round = config['round'] # maximum size of determinant we want to compute
     plot_step = config['plot_step'] # how often we want to plot the energy interval
@@ -56,7 +57,7 @@ def sympy_solve_intervals(matrix, config, hyperparameters=None, det_indep=False)
                     confirmed_intervals = interval
                 else:
                     confirmed_intervals =  Union(confirmed_intervals, interval)
-        if confirmed_intervals != None:
+        if confirmed_intervals != None and confirm:
             round_interval = Union(round_interval, confirmed_intervals)
 
         # record intervals to be plotted
