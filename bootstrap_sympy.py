@@ -12,13 +12,13 @@ from sympy import Poly
 from sympy.sets.sets import Intersection, Union
 from sympy.solvers.inequalities import solve_poly_inequality
 
-def sympy_solve_intervals(matrix, config, det_indep=False):
+def sympy_solve_intervals(matrix, config, hyperparameters=None, det_indep=False):
     '''
-        matrix -> class   : the potential we want to solve
-        config -> dict    : contains information of hyperparameters
+        matrix -> class : the potential we want to solve
+        config -> dict : contains information computing
+        hyperparameters -> dict : contains information of hyperparameters
         det_indep -> bool : whether intersect new intervals with old intervals
     '''
-    k = config['k'] # constant coefficient of the potential
     round = config['round'] # maximum size of determinant we want to compute
     plot_step = config['plot_step'] # how often we want to plot the energy interval
     energy_threshold = config['threshold'] # sympy can't solve too small intervals, so we keep small intervals
@@ -32,7 +32,10 @@ def sympy_solve_intervals(matrix, config, det_indep=False):
 
         # solve inequalities
         t_start = time.time()
-        possible_intervals = solve_poly_inequality(Poly(matrix.submatrix(i).det().evalf(subs={matrix.k:k}), matrix.E), '>=')
+        if hyperparameters != None:
+            possible_intervals = solve_poly_inequality(Poly(sp.N(matrix.submatrix(i).det(), subs=hyperparameters), matrix.E), '>=')
+        else:
+            possible_intervals = solve_poly_inequality(Poly(sp.N(matrix.submatrix(i).det()), matrix.E), '>=')
         t_end = time.time()
         print(f"Time cost = {t_end - t_start:.2f}")
 
@@ -60,7 +63,7 @@ def sympy_solve_intervals(matrix, config, det_indep=False):
         if i%plot_step == 0:
             energy_intervals.append(sp.N(round_interval))
     
-    return energy_intervals, sp.N(confirmed_intervals)
+    return energy_intervals, confirmed_intervals
 
 def plot_energy_interval(energy_intervals, energy_eigenvalues, config):
     '''
@@ -69,7 +72,6 @@ def plot_energy_interval(energy_intervals, energy_eigenvalues, config):
         config -> dict : contains information of hyperparameters
     '''
 
-    k = config['k'] # constant coefficient of the potential
     x_inf = config['x_inf'] # infimum of x plot
     x_sup = config['x_sup'] # supreme of x plot
     plot_step = config['plot_step'] # how often we want to plot the energy interval
