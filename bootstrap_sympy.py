@@ -36,7 +36,10 @@ def sympy_solve_intervals(matrix, config, mode='Rational', keep=False):
         if mode == 'Poly':
             possible_intervals = solve_poly_inequality(Poly(det, matrix.E), '>=')
         elif mode == 'Rational':
-            numerator, denominator = sp.fraction(det)
+            det = sp.simplify(det)
+            print("Finish det")
+            numerator, denominator = det.as_numer_denom()
+            print("Finish extracting numerator and denominator ...")
             numerator, denominator = sp.Poly(numerator, matrix.E), sp.Poly(denominator, matrix.E)
             possible_intervals = solve_rational_inequalities([[((numerator, denominator), '>=')]])
         else:
