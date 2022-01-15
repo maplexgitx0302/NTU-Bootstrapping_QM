@@ -78,10 +78,11 @@ def sympy_solve_intervals(matrix, config, mode='Rational', keep=False):
     
     return energy_intervals, confirmed_intervals
 
-def plot_energy_interval(energy_intervals, energy_eigenvalues, config):
+def plot_energy_interval(energy_intervals, energy_eigenvalues, x_ticks, config):
     '''
         energy_intervals -> list : intervals solved with sympy inequalities
         energy_eigenvalues -> list : analytical energy eigenvalues
+        x_ticks -> list : ticks at x-axis
         config -> dict : contains information of hyperparameters
     '''
 
@@ -89,23 +90,24 @@ def plot_energy_interval(energy_intervals, energy_eigenvalues, config):
     x_sup = config['x_sup'] # supreme of x plot
     plot_step = config['plot_step'] # how often we want to plot the energy interval
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(12,8))
+    plt.xticks(energy_eigenvalues, x_ticks)
     ax.set_xlim(x_inf, x_sup)
 
     # plot verticle line of energy eigenvalues
     for En in energy_eigenvalues:
         plt.axvline(x=En, color='white')
 
-    color_list = ['b', 'g', 'r', 'c', 'm', 'y']
+    color_list = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
     for i in range(len(energy_intervals)):
-        y_plot = ['L='+str(plot_step*(i+1)), 'L='+str(plot_step*(i+1))]
+        y_plot = [f"$K$={plot_step*(i+1)}", f"$K$={plot_step*(i+1)}"]
         if type(energy_intervals[i]) == sp.Interval:
             # only one interval
             x_plot = [float(energy_intervals[i].inf), min(1e9, float(energy_intervals[i].sup))]
-            ax.plot(x_plot, y_plot, marker='o', color = color_list[(i)%len(color_list)])
+            ax.plot(x_plot, y_plot, marker='o', color = 'tab:'+color_list[(i)%len(color_list)])
         else:
             # union of intervals
             for plot_interval in energy_intervals[i].args:
                 x_plot = [float(plot_interval.inf), min(1e9, float(plot_interval.sup))]
-                ax.plot(x_plot, y_plot, marker='o', color = color_list[(i)%len(color_list)])
+                ax.plot(x_plot, y_plot, marker='o', color = 'tab:'+color_list[(i)%len(color_list)])
     return fig, ax
