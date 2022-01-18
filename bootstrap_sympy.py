@@ -43,19 +43,19 @@ def sympy_solve_intervals(matrix, config, mode='Rational', keep=False, from_chec
             # solve inequalities
             t_start = time.time()
             det = matrix.submatrix(i).det()
+            t_det = time.time()
+            print(f"Calculating determinant time : {t_det-t_start : .2f}")
             if mode == 'Poly':
                 possible_intervals = solve_poly_inequality(Poly(det, matrix.E), '>=')
             elif mode == 'Rational':
                 det = sp.simplify(det)
-                print("Finish det")
                 numerator, denominator = det.as_numer_denom()
-                print("Finish extracting numerator and denominator ...")
                 numerator, denominator = sp.Poly(numerator, matrix.E), sp.Poly(denominator, matrix.E)
                 possible_intervals = solve_rational_inequalities([[((numerator, denominator), '>=')]])
             else:
                 assert False, f"Invalid mode : {mode}"
-            t_end = time.time()
-            print(f"Time cost = {t_end - t_start:.2f}")
+            t_ieq = time.time()
+            print(f"Solving  inequalities time : {t_ieq - t_det:.2f}")
 
             # intersect the new intervals with old intervals
             positive_intervals = []
@@ -112,10 +112,10 @@ def plot_energy_interval(energy_intervals, energy_eigenvalues, x_ticks, config):
         if type(energy_intervals[i]) == sp.Interval:
             # only one interval
             x_plot = [float(energy_intervals[i].inf), min(1e9, float(energy_intervals[i].sup))]
-            ax.plot(x_plot, y_plot, marker='o', color = 'tab:'+color_list[(i)%len(color_list)])
+            ax.plot(x_plot, y_plot, marker='o', color = 'tab:'+color_list[(i//plot_step)%len(color_list)])
         else:
             # union of intervals
             for plot_interval in energy_intervals[i].args:
                 x_plot = [float(plot_interval.inf), min(1e9, float(plot_interval.sup))]
-                ax.plot(x_plot, y_plot, marker='o', color = 'tab:'+color_list[(i)%len(color_list)])
+                ax.plot(x_plot, y_plot, marker='o', color = 'tab:'+color_list[(i//plot_step)%len(color_list)])
     return fig, ax
