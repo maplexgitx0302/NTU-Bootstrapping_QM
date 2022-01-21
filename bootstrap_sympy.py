@@ -12,7 +12,7 @@ from sympy import Poly, Rational
 from sympy.sets.sets import Intersection, Union
 from sympy.solvers.inequalities import solve_poly_inequality, solve_rational_inequalities
 
-def sympy_solve_intervals(matrix, config, mode='Rational', from_checkpoint=True):
+def sympy_solve_intervals(matrix, config, mode='Rational'):
     '''
         matrix -> class : the potential we want to solve
         config -> dict : contains information computing
@@ -20,7 +20,6 @@ def sympy_solve_intervals(matrix, config, mode='Rational', from_checkpoint=True)
         from_checkpoint -> bool : whether to start from saving point
     '''
     round = config['round'] # maximum size of determinant we want to compute
-    energy_threshold = config['threshold'] # sympy can't solve too small intervals, so we keep small intervals
     initial_interval = config['initial_interval'] # initial interval to be start with
     
     if os.path.exists(config['npy_energy_intervals']):
