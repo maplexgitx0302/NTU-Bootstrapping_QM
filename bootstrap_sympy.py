@@ -70,7 +70,7 @@ def sympy_solve_intervals(matrix, config, mode='Rational'):
     
     return energy_intervals
 
-def plot_energy_interval(energy_intervals, energy_eigenvalues, x_ticks, config):
+def plot_energy_interval(energy_intervals, energy_eigenvalues, x_ticks, config, figsize=(12,8), dpi=100):
     '''
         energy_intervals -> list : intervals solved with sympy inequalities
         energy_eigenvalues -> list : analytical energy eigenvalues
@@ -82,7 +82,7 @@ def plot_energy_interval(energy_intervals, energy_eigenvalues, x_ticks, config):
     x_sup = config['x_sup'] # supreme of x plot
     plot_step = config['plot_step'] # how often we want to plot the energy interval
 
-    fig, ax = plt.subplots(figsize=(12,8))
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     plt.xticks(energy_eigenvalues, x_ticks)
     ax.set_xlim(x_inf, x_sup)
 

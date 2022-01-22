@@ -134,8 +134,7 @@ if not os.path.exists(save_dir):
     os.mkdir(save_dir)
 
 cp_config = {
-    'round' : 10, # maximum size of submatrix to compute the determinant
-    'threshold' : 1e-2, # threshold to keep small intervals
+    'round' : 25, # maximum size of submatrix to compute the determinant
     'initial_interval' : sp.Interval(0, sp.oo), # Expect the energy after transformation to be positive
 }
 
@@ -145,10 +144,9 @@ cp_matrix.l = 1 # set l>=1, otherwise l=0 will be failed
 
 k, l = cp_matrix.k, cp_matrix.l
 cp_config['npy_energy_intervals'] = os.path.join(save_dir, f"energy_intervals_k{sp.N(k):.2f}_l{l}.npy")
-cp_config['npy_confirmed_intervals'] = os.path.join(save_dir, f"confirmed_intervals_k{sp.N(k):.2f}_l{l}.npy")
 
 cp_matrix.evaluate()
-energy_intervals, confirmed_intervals = sympy_solve_intervals(cp_matrix, cp_config, mode='Poly', keep=False)
+energy_intervals = sympy_solve_intervals(cp_matrix, cp_config, mode='Poly')
 
 # %%
 """
@@ -160,21 +158,17 @@ For Hydrogen atom, the energy eigenvalues are $E_n=-\frac{\hbar^2}{2m_ea_0^2n^2}
 """
 
 # %%
-if confirmed_intervals != None:
-    print(f"Confirmed intervals = {sp.N(confirmed_intervals)}")
-
-cp_config['plot_step'] = 2 # how often to plot the result
+cp_config['plot_step'] = 3 # how often to plot the result
 cp_config['x_inf'] = 0 # infimum for x-axis when plotting
-cp_config['x_sup'] = 50 # supremum for x-axis when plotting
+cp_config['x_sup'] = 200 # supremum for x-axis when plotting
 
 energy_eigenvalues = [2*(n**2)/k**2 for n in range(1, cp_config['round']+1)]
-x_ticks = [f"$E_{n}$" for n in range(1, cp_config['round']+1)]
+x_ticks = [r"$E_{{{}}}$".format(i) for i in range(len(energy_eigenvalues))]
 
 np.save(cp_config['npy_energy_intervals'], energy_intervals, allow_pickle=True)
-np.save(cp_config['npy_confirmed_intervals'], confirmed_intervals, allow_pickle=True)
 
 sns.set_style('dark')
-sns.set(font_scale=2)
+sns.set(font_scale=1.5)
 fig, ax = plot_energy_interval(energy_intervals, energy_eigenvalues, x_ticks, cp_config)
 ax.set_title(f"Hydrogen Atom $k$={sp.N(k):.2f} and $l$={l}")
 ax.set_xlabel(r"$E_n=\frac{2n^2}{k^2}$ with $n>l$")

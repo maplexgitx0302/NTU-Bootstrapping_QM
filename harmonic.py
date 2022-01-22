@@ -123,20 +123,18 @@ if not os.path.exists(save_dir):
     os.mkdir(save_dir)
 
 hp_config = {
-    'round' : 16, # maximum size of submatrix to compute the determinant
-    'threshold' : 1e-2, # threshold to keep small intervals
+    'round' : 40, # maximum size of submatrix to compute the determinant
     'initial_interval' : sp.Interval(0, sp.oo), # expected region for energy
 }
 
 hp_matrix = HarmonicPotentialMatrix(N=hp_config['round'])
-hp_matrix.k = sp.Rational(1,2)
+hp_matrix.k = 1
 
 k = hp_matrix.k
 hp_config['npy_energy_intervals'] = os.path.join(save_dir, f"energy_intervals_k{sp.N(k):.2f}.npy")
-hp_config['npy_confirmed_intervals'] = os.path.join(save_dir, f"confirmed_intervals_k{sp.N(k):.2f}.npy")
 
 hp_matrix.evaluate()
-energy_intervals, confirmed_intervals = sympy_solve_intervals(hp_matrix, hp_config, mode='Poly', keep=False)
+energy_intervals = sympy_solve_intervals(hp_matrix, hp_config, mode='Poly')
 
 # %%
 """
@@ -146,19 +144,15 @@ The hamiltonian is $H=\frac{P^2}{2}+kx^2$. Recall for 1-D simple harmonic potent
 """
 
 # %%
-if confirmed_intervals != None:
-    print(f"Confirmed intervals = {sp.N(confirmed_intervals)}")
-
 hp_config['plot_step'] = 3 # how often to plot the result
 hp_config['x_inf'] = 0 # infimum for x-axis when plotting
-hp_config['x_sup'] = 10 # supremum for x-axis when plotting
+hp_config['x_sup'] = 20 # supremum for x-axis when plotting
 
 
 energy_eigenvalues = [(2*k)**0.5 * (n+0.5) for n in range(hp_config['round'])]
-x_ticks = [f"$E_{i}$" for i in range(len(energy_eigenvalues))]
+x_ticks = [r"$E_{{{}}}$".format(i) for i in range(len(energy_eigenvalues))]
 
 np.save(hp_config['npy_energy_intervals'], energy_intervals, allow_pickle=True)
-np.save(hp_config['npy_confirmed_intervals'], confirmed_intervals, allow_pickle=True)
 
 sns.set_style('dark')
 sns.set(font_scale=2)
